@@ -1,23 +1,15 @@
 import os
+import numpy as np
 import xml.etree.ElementTree as ET
 
-# FORMAT OUTPUT AS:
-'''
 
-empirical formula: <xxx>
-Peak Location, Peak area, Peak Multiplicity
-<xxx>,<xxx>,<xxx>
-...
-...
-Connectivity matrix
-x_11,...,x_1n
-...
-x_n1,....,x_nn
-
-'''
-
-# Get max molecular dimension size
 def max_update(master,new):
+    '''
+    Checks the individual number of atoms for
+    a molecule and the current mak value for each atom.
+    The purpose is to know the full dimenson necessary
+    to handle every single molecule in the dataset.
+    '''
     for key in new:
         if(key in master.keys()):
             if(master[key] < new[key]): 
@@ -27,8 +19,13 @@ def max_update(master,new):
 
 
 def output2file(mol_dict):
+    '''
+    For each molecule in the dataset dictionary,
+    this function writes the data to an individual 
+    csv file in the data/ folder
+    '''
     for mol in mol_dict:
-        filename = mol + '.mol'
+        filename = mol + '.csv'
         molfile = open('data/' + filename,'w')
 
         # Get Data from molecule dictionary
@@ -37,17 +34,24 @@ def output2file(mol_dict):
             empirical += atom + str(mol_dict[mol][0][atom])
 
         peakline = ''
-        for peak in range(len(mol_dict[mol][1])):
-            peakline += str(mol_dict[mol][1][peak][0]) + ',' \
-                      + str(mol_dict[mol][1][peak][1]) + ',' \
-                      + str(mol_dict[mol][1][peak][2]) + '\n'
+        for peak in range(len(mol_dict[mol][2])):
+            peakline += str(mol_dict[mol][2][peak][0]) + ' ' \
+                      + str(mol_dict[mol][2][peak][1]) + ' ' \
+                      + str(mol_dict[mol][2][peak][2]) + '\n'
 
+        elemstr = mol_dict[mol][1][0]
+        graph = mol_dict[mol][1][1]
 
-        # Write to individual file
+        # Write to individual .csv file
         molfile.write('Empirical formula: ' + empirical + '\n')
-        molfile.write('Peak Location, Peak area, Peak Multiplicity' + '\n')
+        molfile.write('peakLocation peakArea peakMultiplicity' + '\n')
         molfile.write(peakline)
         molfile.write('Connectivity Matrix' + '\n')
+        molfile.write(elemstr + '\n')
+        for i in range(len(graph)):
+            for j in range(len(graph)):
+                molfile.write(str(graph[i,j]) + ' ')
+            molfile.write('\n')
         molfile.close()
 
 
@@ -56,9 +60,10 @@ def output2file(mol_dict):
 tree = ET.parse("nmrshiftdb2.xml")
 root = tree.getroot()
 
-# Max size testing dictionary
+# initialize max size testing dictionary
 maxed = {}
 
+# Parse Molecule object from XML file
 count = 0
 molecules = {}
 for mol in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}molecule'):
@@ -66,29 +71,42 @@ for mol in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}molecule'):
     ident = mol.attrib['id']
     atoms = mol.find('{www.xml-cml.org/schema/schema24/schema.xsd}atomArray')
     
-    # Calculate empirical formula
+    # Calculate empirical formula and num of atoms
     empirical = {}
+    atomcount = 0
+    elemstr = ''
     for i in atoms:
         elem = i.attrib['elementType']
-        
+        elemstr += elem + ' '
+        atomcount += 1
         if(elem in empirical):
             empirical[elem] += 1
         else:
             empirical[elem]  = 1
-    #print(empirical)
-    
-    max_update(maxed,empirical)
-
 
     molecules[ident] = [empirical]
 
+    # Make molecular graph
+    bonds = mol.find('{www.xml-cml.org/schema/schema24/schema.xsd}bondArray')
+    bondorder = {'S': 1, 'D': 2, 'T': 3, 'Q': 4}
+    bondinfo = []
+    graph = np.zeros((atomcount,atomcount),dtype=int)
+    for i in bonds:
+        bstr = i.attrib['atomRefs2'].split()
+        indx1 = int(bstr[0][1:]) - 1
+        indx2 = int(bstr[1][1:]) - 1
+        order = bondorder[i.attrib['order']]
+
+        # Make full, redundant graph matrix
+        graph[indx1,indx2] = order
+        graph[indx2,indx1] = order
+
+    molecules[ident].append([elemstr,graph])
+
+    if(count > 10): break
 
 
-    #if(count > 10): break
-
-print('MAXED: ', maxed)
-
-
+# Parse Spectrum object from XML file
 count2 = 0
 for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum'):
     count2 += 1
@@ -102,6 +120,10 @@ for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum')
     # Get peaks for 13C NMR
     nmrpeaks = []
     if('13C' in nmrtype):
+
+        # Update max dim of molecule data
+        max_update(maxed,molecules[molref][0])
+
         for peak in spec.find('{www.xml-cml.org/schema/schema24/schema.xsd}peakList'):
 
             # Initialize variables
@@ -136,155 +158,10 @@ for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum')
 
     if(count2 > 10): break
 
-#print('MOLECULES: ',molecules)
 
-#output2file(molecules)
+output2file(molecules)
 
     
 
 
-
-'''
-count2 = 0
-for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum'):
-    count2 += 1
-    molref = spec.attrib['moleculeRef']
-     
-    # Get NMR type
-    nmrtype = []
-    for n in spec.find('{www.xml-cml.org/schema/schema24/schema.xsd}metadataList'):
-        nmrtype.append(n.attrib['content'])
-
-    # Get peak for 1H NMR
-    nmrpeaks = []
-    if('1H' in nmrtype):
-        for peak in spec.find('{www.xml-cml.org/schema/schema24/schema.xsd}peakList'):
-            #integrate = peak.attrib['atomRefs']
-            integrate = peak.find('{www.xml-cml.org/schema/schema24/schema.xsd}atomRefs')
-            intcount = 1
-            if(integrate != None):
-                for i in integrate:
-                    if(i == ' '): 
-                        intcount += 1
-            mult = peak.find('{www.xml-cml.org/schema/schema24/schema.xsd}peakMultiplicity')
-            if(mult != None): print(mult)
-            #if(peak.attrib['peakMultiplicity'] != None):
-            #    print(peak.attrib['peakMultiplicity'])
-            #else:
-            #    pass
-            nmrpeaks.append([peak.attrib['xValue'],intcount,],peak.attrib['xValue'])
-
-
-
-    # FIXME?: do this later once sure there is no 1H NMR spectra
-    if('1H' not in nmrtype):
-        molecules.pop(molref,0)
-    else:
-        molecules[molref].append(nmrpeaks)
-
-
-    if(count2 > 60): break
-
-print(molecules)
-
-
-'''
-
-
-'''
-count = 0
-confirm = False
-for branch in root:
-    count += 1
-    #print('Branch: ',branch.tag)
-    switch = False
-    try:
-        if(branch.attrib['title'] == 'Tetrafluoroborate'):
-            print(branch.attrib['title'])
-            switch = True
-            
-    except:
-        continue
-
-    if(switch):
-        for child in branch:
-            #for i in child:            
-            print('Child: ',child)
-            for i in child:
-                print(i.tag,i.attrib)
-
-            if("bondArray" in child.tag):
-                for k in child:
-                    print(k.tag,k.attrib)
-            
-            if("peakList" in child.tag):
-                for i in child:
-                    print(i.tag,i.attrib)
-            if("atomArray" in child.tag):
-                for i in child:
-                    print(i.attrib,i.attrib['elementType'])
-'''
-
-
-
-'''
-count = 0
-confirm = False
-
-for i, branch in enumerate(root):
-
-    count += 1
-    print(i, branch)
-    for obj in branch:
-        if('moleculeRef' in obj):
-            print(branch['moleculeRef'])
-        print(obj)
-    #if molecule():
-        #find spectrum id
-
-    #else
-
-
-    if(count > 10):
-        break
-'''
-
-'''
-for i, mol in enumerate(root):
-    count += 1
-    print('Molecule: ',mol.attrib)
-
-    for prop in mol:
-        print('Property: ',prop)
-        #for i in prop:
-        #    print(i.tag,i.attrib)
-
-        if("atomArray" in prop.tag):
-            empirical = {}
-            for k in prop:
-                print('ATOMS: ',k.attrib['elementType'])
-                elem = k.attrib['elementType']
-                
-                if(elem in empirical):
-                    empirical[elem] += 1
-                else:
-                    empirical[elem]  = 1
-                
-
-
-            print('COUNT: ',empirical)
-            
-        
-        if("peakList" in prop.tag):
-            for i in prop:
-                print(i.tag,i.attrib)
-        if("atomArray" in prop.tag):
-            for i in prop:
-                print(i.attrib,i.attrib['elementType'])
-        
-
-    if(count > 3):
-        break
-
-'''
 
