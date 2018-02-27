@@ -1,26 +1,23 @@
-sudo: false 
-
-language: python 
-
+sudo: false
+language: python
 env:
   global:
-    - PIP_DEPS="pytest coveralls pytest-cov flake8"
-
+  - PIP_DEPS="pytest coveralls pytest-cov flake8"
 python:
-  - '2.7'
-  - '3.6'
-
-
+- '2.7'
+- '3.6'
 install:
 - travis_retry pip install $PIP_DEPS
 - travis_retry pip install -r requirements.txt
 - travis_retry pip install -e .
-
 script:
-- flake8 `find . -name \*.py | grep -v setup.py | grep -v version.py | grep -v __init__.py | grep -v /doc/`
+- flake8 `find . -name \*.py | grep -v setup.py | grep -v version.py | grep -v __init__.py
+  | grep -v /doc/`
 - mkdir for_test
 - cd for_test
 - py.test --pyargs sspinn --cov-report term-missing --cov=sspinn
-
 after_success:
 - coveralls
+notifications:
+  slack:
+    secure: Enjc25x5+ggW9HnLeMf0CByXmshRHGWOU8SDMHcVRn5533Hoeghk2p0hU3OT+ORUveD2/wQ8UjXEJJCfoEoraIWEkC634r3VimOQOjOna1xbJR7HgO8QiZq0nJ9TAxv/b6FJJaN/qmFA2my0uBEqpRifGuM0DvfH5DpEBjLnntjLKqpcu4dRZG0Emw5CeYuj8c4y5BFN6nsNJZP5tSzFzz8wm/ywCUHFUbf3+7JHA2PaDq/2LSjE4E8uILX2gGmZ0xuN9pC+fV0td3u2Le4d3pb8gwgi/nIDd6v4ECsp249pcXj6PJChPs9zpvdDQRdr+miTJSl6SwOgnxBfaa/rFcANJ312YmGw+qIgyYsc1TAZZYk2wU2zJIfXLEJqL0sruN9YSAGuw4sOav27zbEeZGrQXAwnL5ed6W27kMYjhwKMPyzZI2+v2cmpY+x9rMEsBWZY2Meo7VRif9dE49ylX9uqEYI+geeZNLjfb+2AEIOv6gJ2/QZk6wXuCBxw+fVo5jRxq3ZXKotYGyPTZKSIBYkfmWBAL/cM4UqRCh4Zl9qQiEyT3gYotvXdgw7N8fmqeHrdUCUhLj0w0IkN278DSHyvCyv2mW+HPRep5Tgae3XMBew6zyMUcoAH+LS5+y8vWWRrFLMn1x9rBD5iPGsVcXkSh/uE6C7lMMTFg3jclj4=
