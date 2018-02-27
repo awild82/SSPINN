@@ -16,6 +16,14 @@ x_n1,....,x_nn
 
 '''
 
+# Get max molecular dimension size
+def max_update(master,new):
+    for key in new:
+        if(key in master.keys()):
+            if(master[key] < new[key]): 
+                master[key] = new[key]
+        else:
+            master[key] = new[key]
 
 
 def output2file(mol_dict):
@@ -43,10 +51,13 @@ def output2file(mol_dict):
         molfile.close()
 
 
+
 # Read in custom XML file
 tree = ET.parse("nmrshiftdb2.xml")
 root = tree.getroot()
 
+# Max size testing dictionary
+maxed = {}
 
 count = 0
 molecules = {}
@@ -65,14 +76,17 @@ for mol in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}molecule'):
         else:
             empirical[elem]  = 1
     #print(empirical)
+    
+    max_update(maxed,empirical)
+
 
     molecules[ident] = [empirical]
 
 
 
-    if(count > 10): break
+    #if(count > 10): break
 
-#print(molecules)
+print('MAXED: ', maxed)
 
 
 count2 = 0
@@ -124,9 +138,9 @@ for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum')
 
 #print('MOLECULES: ',molecules)
 
-output2file(molecules)
+#output2file(molecules)
 
-
+    
 
 
 
