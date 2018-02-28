@@ -24,7 +24,15 @@ def output2file(mol_dict):
     this function writes the data to an individual 
     csv file in the data/ folder
     '''
+
     for mol in mol_dict:
+
+        # Check for incomplete data
+        try:
+            temp = mol_dict[mol][2]
+        except:
+            continue
+
         filename = mol + '.csv'
         molfile = open('data/' + filename,'w')
 
@@ -56,6 +64,8 @@ def output2file(mol_dict):
 
 
 
+#------ Main Parsing Section ------
+
 # Read in custom XML file
 tree = ET.parse("nmrshiftdb2.xml")
 root = tree.getroot()
@@ -64,12 +74,12 @@ root = tree.getroot()
 maxed = {}
 
 # Parse Molecule object from XML file
-count = 0
 molecules = {}
 for mol in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}molecule'):
-    count += 1
     ident = mol.attrib['id']
     atoms = mol.find('{www.xml-cml.org/schema/schema24/schema.xsd}atomArray')
+
+
     
     # Calculate empirical formula and num of atoms
     empirical = {}
@@ -103,15 +113,23 @@ for mol in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}molecule'):
 
     molecules[ident].append([elemstr,graph])
 
-    if(count > 10): break
+    # Remove fringe case compounds
+    atoms_wanted = ['C', 'O', 'N', 'H', 'S', 'F', 'Cl', 'Br', 'P', 'B', 'I']
+    for i in atoms:
+        if(i.attrib['elementType'] not in atoms_wanted):
+            molecules.pop(ident,0)
+            break
+        else:
+            pass
+
+
 
 
 # Parse Spectrum object from XML file
-count2 = 0
+ppmMinMax = {'Max': 0., 'Min': 1000.}
 for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum'):
-    count2 += 1
     molref = spec.attrib['moleculeRef']
-     
+
     # Get NMR type
     nmrtype = []
     for n in spec.find('{www.xml-cml.org/schema/schema24/schema.xsd}metadataList'):
@@ -119,12 +137,16 @@ for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum')
 
     # Get peaks for 13C NMR
     nmrpeaks = []
-    if('13C' in nmrtype):
-
-        # Update max dim of molecule data
-        max_update(maxed,molecules[molref][0])
+    if('13C' in nmrtype and molref in molecules):
 
         for peak in spec.find('{www.xml-cml.org/schema/schema24/schema.xsd}peakList'):
+            
+            # Get max range of ppm's in dataset
+            ppm = float(peak.attrib['xValue'])
+            if(ppmMinMax['Max'] < ppm):
+                ppmMinMax['Max'] = ppm
+            if(ppmMinMax['Min'] > ppm):
+                ppmMinMax['Min'] = ppm
 
             # Initialize variables
             intcount = None
@@ -148,17 +170,20 @@ for spec in root.findall('{www.xml-cml.org/schema/schema24/schema.xsd}spectrum')
 
             nmrpeaks.append([peak.attrib['xValue'],intcount,mult])
 
-
-    # FIXME?: do this later once sure there is no 13C NMR spectra
-    if('13C' not in nmrtype):
-        molecules.pop(molref,0)
-    else:
+        max_update(maxed,molecules[molref][0])
         molecules[molref].append(nmrpeaks)
+ 
+    else:
+        molecules.pop(molref,0)
 
 
-    if(count2 > 10): break
+
+#print('MAX: ', maxed)
+#print('SIZE: ', len(molecules))
+#print('PPMRANGE: ', ppmMinMax)
 
 
+# Write to data files
 output2file(molecules)
 
     
