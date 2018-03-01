@@ -12,7 +12,7 @@ install:
 - travis_retry pip install -e .
 script:
 - flake8 `find . -name \*.py | grep -v setup.py | grep -v version.py | grep -v __init__.py
-  | grep -v /doc/`
+  | grep -v /doc/ | grep -v /data/`
 - mkdir for_test
 - cd for_test
 - py.test --pyargs sspinn --cov-report term-missing --cov=sspinn
