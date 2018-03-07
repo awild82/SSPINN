@@ -19,8 +19,16 @@ def test_nn_translator():
     non_str = 0
     non_bool = 0
     fake_file = 'i_dont_exist.fake'
-    bad_file = 'data/nn_translator_bad.csv'
-    good_file = 'data/nn_translator_data.csv'
+    bad_file = '../sspinn/test/data/nn_translator_bad.txt'
+    good_file = '../sspinn/test/data/nn_translator_data.txt'
+    conn_file = '../sspinn/test/data/nn_translator_conn.txt'
+    test_file = '../sspinn/test/data/nn_translator_test.txt'
+
+    # Python 2 compatibility
+    try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
 
     # Check defensive programming
     assert_raises(nnt, TypeError, non_str)
@@ -52,8 +60,7 @@ def test_nn_translator():
                  '200.1': 'S'}
     peak_vec = np.zeros((npts,))
     for peak, mult in peak_dict.items():
-        print((peak, mult))
-        loc = int((peak-bounds[0])*10)
+        loc = int((float(peak)-bounds[0])*10)
         if mult == 'S':
             m = 1
         elif mult == 'D':
@@ -63,10 +70,10 @@ def test_nn_translator():
         elif mult == 'Q':
             m = 4
         peak_vec[loc] = m
-    expected_vec = np.concat([emp_frm, peak_vec])
+    expected_vec = np.concatenate([emp_frm, peak_vec])
 
     # Get expected connectivity
-    expected_conn = np.loadtxt('data/nn_translator_conn.txt')
+    expected_conn = np.loadtxt(conn_file)
 
     # Check treating training like testing data
     result = nnt(good_file)
@@ -76,7 +83,7 @@ def test_nn_translator():
     assert all(result[0] == expected_vec)
 
     # Check testing data
-    result = nnt('data/nn_translator_test.csv')
+    result = nnt(test_file)
     assert isinstance(result[0], list)
     assert result[1] is None
     assert len(result[0]) == expected_vec.shape[0]
@@ -89,4 +96,9 @@ def test_nn_translator():
     assert len(result[0]) == expected_vec.shape[0]
     assert all(result[0] == expected_vec)
     assert len(result[1]) == expected_conn.shape[0]
-    assert all(result[1] == expected_conn)
+
+    for i in range(0, len(result[1])):
+        for j in range(0, len(result[1][i])):
+            print('i,j: (', i, ',', j, '):', result[1][i][j],
+                  expected_conn[i][j])
+        assert all(result[1][i] == expected_conn[i])
