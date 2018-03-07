@@ -76,14 +76,14 @@ def test_nn_translator():
     expected_conn = np.loadtxt(conn_file)
 
     # Check treating training like testing data
-    result = nnt(good_file)
+    result = nnt(good_file, train=False)
     assert isinstance(result[0], list)
     assert result[1] is None
     assert len(result[0]) == expected_vec.shape[0]
     assert all(result[0] == expected_vec)
 
     # Check testing data
-    result = nnt(test_file)
+    result = nnt(test_file, train=False)
     assert isinstance(result[0], list)
     assert result[1] is None
     assert len(result[0]) == expected_vec.shape[0]

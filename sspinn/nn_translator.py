@@ -1,7 +1,10 @@
+import multiprocessing as mltp
+import numpy as np
+import os
 import re
 
 
-def nn_translator(filename, train=False):
+def nn_translator(filename, train=True):
     max_el = 10
     max_spec = 3338
     max_cm = 432
@@ -128,3 +131,28 @@ def nn_translator(filename, train=False):
     output = (el + spectra, connectivity_matrix)
 
     return output
+
+
+def _multiprocess_preload_data(nproc=28, data_dir='data/data'):
+
+    dir_list = os.listdir(data_dir)
+    file_list = []
+    for f in dir_list:
+        if '.txt' in f:
+            file_list.append(data_dir + '/' + f)
+
+    pool = mltp.Pool(processes=nproc)
+    p = pool.map(nn_translator, file_list)
+    p = np.array(p)
+
+    np.save('data/preprocessed_input.npy',
+            np.array([np.array(i) for i in p[:, 0]]).astype(np.uint8))
+    target = np.array([np.array(i) for i in p[:, 1]])
+    tshape = target.shape
+    np.save('data/preprocessed_target.npy',
+            target.reshape((tshape[0], tshape[1]*tshape[2])).astype(np.uint8))
+
+
+if __name__ == "__main__":
+    import sys
+    _multiprocess_preload_data(nproc=int(sys.argv[1]), data_dir=sys.argv[2])
