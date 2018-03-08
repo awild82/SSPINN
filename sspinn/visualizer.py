@@ -37,8 +37,8 @@ class visualizer:
 
         # initialize numpy matrices
         # tempmat = np.zeros((13,atomcount),dtype=int) #FOR TEST CASE BELOW
-        tempmat = np.zeros((432, atomcount), dtype=int)
-        adjmat = np.zeros((atomcount, atomcount), dtype=int)
+        tempmat = np.zeros((432, atomcount))
+        adjmat = np.zeros((atomcount, atomcount))
 
         # Get the non-zero columns from the NN output adjacency matrix
         total = 0
@@ -60,7 +60,11 @@ class visualizer:
             adjmat[rowshift:length+rowshift, :] = tempmat[start:end, :]
             rowshift += length
 
-        self.adjmat = adjmat
+        # Round to integers
+        rmat = np.around(adjmat, 0)
+        rmat = rmat.astype(int)
+
+        self.adjmat = rmat
 
     def _genLabels(self):
         '''
