@@ -1,5 +1,7 @@
 numpy
 scipy
 matplotlib
-pandas
 networkx
+keras
+tensorflow
+h5py
