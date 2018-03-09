@@ -4,7 +4,7 @@ import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
 
 
-class visualizer:
+class Visualizer:
 
     def __init__(self, full, empirical):
 
