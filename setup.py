@@ -1,8 +1,7 @@
 #!/bin/python
 
 import os
-from setuptools import setup, find_packages
-PACKAGES = find_packages()
+from setuptools import setup
 
 # Get version and release info, which is all stored in sspinn/version.py
 ver_file = os.path.join('sspinn', 'version.py')
@@ -25,6 +24,7 @@ opts = dict(name=NAME,
             packages=PACKAGES,
             package_data=PACKAGE_DATA,
             install_requires=REQUIRES,
+            include_package_data=True,
             requires=REQUIRES)
 
 

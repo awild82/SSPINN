@@ -1,0 +1,5 @@
+[run]
+omit =
+  *__init__.py
+  sspinn/version.py
+  sspinn/__main__.py

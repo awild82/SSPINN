@@ -69,14 +69,17 @@ class Predictor(object):
     def load_nn(self, net='last_trained.h5'):
         """ Loads a previously trained neural net for prediction """
 
+        nets_dir = __file__.strip('predict.py')
+        nets_dir += 'nets'
+        print(nets_dir)
         if not isinstance(net, str):
             raise TypeError('Input "net" is not string')
 
-        if not os.path.isdir('nets'):
+        if not os.path.isdir(nets_dir):
             raise NotADirectoryError('Directory nets/ does not exist')
-        if net in os.listdir('nets'):
+        if net in os.listdir(nets_dir):
             self._nn = Net()
-            self._nn.load_weights('nets/' + net)
+            self._nn.load_weights(nets_dir + '/' + net)
 
     def _load_data(self, data_dir):
         """ Loading default data """
