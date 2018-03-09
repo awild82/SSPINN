@@ -1,6 +1,5 @@
 import os
 import pickle
-
 import keras
 import numpy as np
 
@@ -37,7 +36,7 @@ class Net(keras.models.Sequential):
 class Predictor(object):
     """Contains NN and helper functions"""
 
-    def __init__(self, train=False, data_dir='../data'):
+    def __init__(self, train=False, data_dir='../data', net='last_trained.h5'):
         if train:
             self._data = np.empty((0, _N_DIMS_IN))
             self._target = np.empty((0, _N_DIMS_OUT))
@@ -45,7 +44,7 @@ class Predictor(object):
             self._nn = Net()
         else:
             self._data = None
-            self.load_nn()
+            self.load_nn(net=net)
         self.history = None
 
     def set_nn(self, nn):
@@ -75,8 +74,9 @@ class Predictor(object):
 
         if not os.path.isdir('nets'):
             raise NotADirectoryError('Directory nets/ does not exist')
-        if net not in os.listdir('nets'):
-            self.set_nn(keras.models.load_model('nets/' + net))
+        if net in os.listdir('nets'):
+            self._nn = Net()
+            self._nn.load_weights('nets/' + net)
 
     def _load_data(self, data_dir):
         """ Loading default data """

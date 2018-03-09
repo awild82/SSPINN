@@ -69,7 +69,7 @@ def nn_translator(filename, train=True):
     if not line2.startswith('peakLocation peakArea peakMultiplicity'):
         raise ValueError
 
-    spectra = [0.0]*max_spec
+    spectra = [0]*max_spec
 
     line = file_object.readline()
 
@@ -94,7 +94,7 @@ def nn_translator(filename, train=True):
     else:
         if not line.startswith('Connectivity Matrix'):
             raise ValueError
-        connectivity_matrix = [[0.0]*max_cm]*max_cm
+        connectivity_matrix = [[0]*max_cm]*max_cm
         line = file_object.readline()
         atoms = re.findall("([A-Za-z]+)", line)
 
@@ -106,7 +106,7 @@ def nn_translator(filename, train=True):
             line = file_object.readline()
 
             matches = re.findall("(\d)", line)
-            cm_row = [0.0]*max_cm
+            cm_row = [0]*max_cm
 
             atom_i = atoms[i]
             offset_i = offset_dict_i[atom_i]
@@ -128,7 +128,7 @@ def nn_translator(filename, train=True):
             connectivity_matrix[offset_i] = cm_row
             offset_dict_i[atom_i] += 1
 
-    output = (el + spectra, connectivity_matrix)
+    output = (el + spectra, connectivity_matrix, empirical_formula)
 
     return output
 
