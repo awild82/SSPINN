@@ -42,8 +42,6 @@ def nn_translator(filename, train=True):
 
     el = [0]*max_el
 
-    print(empirical_formula)
-
     for key, val in empirical_formula.items():
         if key == 'H':
             el[0] = val
