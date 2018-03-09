@@ -26,7 +26,7 @@ def nn_translator(filename, train=True):
 
     empirical_formula = {}
 
-    matches = re.findall("(\D+)(\d*)", line1)
+    matches = re.findall("([A-Za-z]+)(\d*)", line1)
 
     for match in matches:
         atom = match[0][0:2]
@@ -41,6 +41,8 @@ def nn_translator(filename, train=True):
             empirical_formula[atom] = atom_count
 
     el = [0]*max_el
+
+    print(empirical_formula)
 
     for key, val in empirical_formula.items():
         if key == 'H':
