@@ -42,7 +42,7 @@ def test_nn_translator():
     emp_frm[1] = 15
     emp_frm[3] = 2
     bounds = (0, 333.8)
-    npts = int((bounds[1]-bounds[0])*10)
+    npts = int((bounds[1]-bounds[0])*10+1)
     peak_dict = {'9.1': 'Q',
                  '10.9': 'Q',
                  '24.2': 'Q',
@@ -70,7 +70,7 @@ def test_nn_translator():
         elif mult == 'Q':
             m = 4
         peak_vec[loc] = m
-    expected_vec = np.concatenate([emp_frm, peak_vec])
+    expected_vec = np.concatenate([emp_frm, peak_vec]).astype(int)
 
     # Get expected connectivity
     expected_conn = np.loadtxt(conn_file)
