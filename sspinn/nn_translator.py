@@ -6,7 +6,7 @@ import re
 
 def nn_translator(filename, train=True):
     max_el = 10
-    max_spec = 3338
+    max_spec = 3339
     max_cm = 432
 
     if not isinstance(train, bool):
@@ -77,13 +77,13 @@ def nn_translator(filename, train=True):
         matches = re.findall("(\d+\.\d)( )(\d+)( )(\D)", line)
         for match in matches:
             if match[4].lower() == 's':
-                spectra[int(float(match[0])*10)] = 1.0
+                spectra[int(float(match[0])*10)] = 1
             elif match[4].lower() == 'd':
-                spectra[int(float(match[0])*10)] = 2.0
+                spectra[int(float(match[0])*10)] = 2
             elif match[4].lower() == 't':
-                spectra[int(float(match[0])*10)] = 3.0
+                spectra[int(float(match[0])*10)] = 3
             elif match[4].lower() == 'q':
-                spectra[int(float(match[0])*10)] = 4.0
+                spectra[int(float(match[0])*10)] = 4
         line = file_object.readline()
 
         if line == '':
