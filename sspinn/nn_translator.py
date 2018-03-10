@@ -5,7 +5,7 @@ import re
 
 
 def nn_translator(filename, train=True):
-    max_el = 10
+    max_el = 11
     max_spec = 3339
     max_cm = 432
 
@@ -63,6 +63,8 @@ def nn_translator(filename, train=True):
             el[8] = val
         elif key == 'B':
             el[9] = val
+        elif key == 'S':
+            el[10] = val
         else:
             raise TypeError
 
