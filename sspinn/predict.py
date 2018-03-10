@@ -55,7 +55,9 @@ class Predictor(object):
     def train(self, filepath='sspinn/nets/last_trained.h5', epochs=10000,
               validation_split=0.2, **kwargs):
         """ Main method for training the neural net """
-        chkpt = keras.callbacks.ModelCheckpoint(filepath, save_best_only=True)
+        chkpt = keras.callbacks.ModelCheckpoint(
+            filepath, save_best_only=True, save_weights_only=True
+        )
         bar = keras.callbacks.ProgbarLogger(count_mode='samples')
         self._check_net(self._nn)
         hist = self._nn.fit(x=self._data, y=self._target,
