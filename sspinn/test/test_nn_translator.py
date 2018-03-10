@@ -37,7 +37,7 @@ def test_nn_translator():
     assert_raises(nnt, ValueError, bad_file)
 
     # Form expected vector
-    emp_frm = np.zeros((10,))
+    emp_frm = np.zeros((11,))
     emp_frm[0] = 22
     emp_frm[1] = 15
     emp_frm[3] = 2

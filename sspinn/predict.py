@@ -4,7 +4,7 @@ import keras
 import numpy as np
 
 
-_N_DIMS_IN = 3349
+_N_DIMS_IN = 3350
 _N_DIMS_OUT = 186624
 
 # Python 2 compatibility
