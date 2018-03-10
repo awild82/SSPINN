@@ -63,6 +63,8 @@ def nn_translator(filename, train=True):
             el[8] = val
         elif key == 'B':
             el[9] = val
+        else:
+            raise TypeError
 
     line2 = file_object.readline()
 
@@ -84,6 +86,9 @@ def nn_translator(filename, train=True):
                 spectra[int(float(match[0])*10)] = 3
             elif match[4].lower() == 'q':
                 spectra[int(float(match[0])*10)] = 4
+            else:
+                raise TypeError
+
         line = file_object.readline()
 
         if line == '':
