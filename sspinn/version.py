@@ -69,5 +69,5 @@ MINOR = _version_minor
 MICRO = _version_micro
 VERSION = __version__
 PACKAGES = ["sspinn"]
-PACKAGE_DATA = {'nets': ['sspinn/nets/*.h5']}
+PACKAGE_DATA = {'nets': ['sspinn/nets/hyak_long.h5']}
 REQUIRES = []
