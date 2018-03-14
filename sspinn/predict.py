@@ -36,11 +36,13 @@ class Net(keras.models.Sequential):
 class Predictor(object):
     """Contains NN and helper functions"""
 
-    def __init__(self, train=False, data_dir='../data', net='last_trained.h5'):
+    def __init__(self, train=False, data_dir='../data', net='last_trained.h5',
+                 test=False):
         if train:
             self._data = np.empty((0, _N_DIMS_IN))
             self._target = np.empty((0, _N_DIMS_OUT))
-            self._load_data(data_dir)
+            if not test:
+                self._load_data(data_dir)
             self._nn = Net()
         else:
             self._data = None
