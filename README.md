@@ -1,4 +1,4 @@
-<img src="./SSPINN/docs/images/SSPINN_Logo.png" width="350" class="center">
+<img src="./docs/images/SSPINN_Logo.png" width="350" class="center">
 
 
 <a href='https://coveralls.io/github/awild82/SSPINN'><img src='https://coveralls.io/repos/github/awild82/SSPINN/badge.svg' alt='Coverage Status' class='center'/></a> <a href='https://travis-ci.org/awild82/SSPINN'><img src='https://travis-ci.org/awild82/SSPINN.svg?branch=master' alt='Coverage Status' class='center'/></a>
