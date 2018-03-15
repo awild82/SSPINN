@@ -1,7 +1,8 @@
 <img src="./docs/images/SSPINN_Logo.png" width="350" class="center">
 
 
-<a href='https://coveralls.io/github/awild82/SSPINN'><img src='https://coveralls.io/repos/github/awild82/SSPINN/badge.svg' alt='Coverage Status' class='center'/></a> <a href='https://travis-ci.org/awild82/SSPINN'><img src='https://travis-ci.org/awild82/SSPINN.svg?branch=master' alt='Coverage Status' class='center'/></a>
+<a href='https://coveralls.io/github/awild82/SSPINN?branch=master'><img src='https://coveralls.io/repos/github/awild82/SSPINN/badge.svg?branch=master' alt='Coverage Status' class='center'/></a>
+<a href='https://travis-ci.org/awild82/SSPINN'><img src='https://travis-ci.org/awild82/SSPINN.svg?branch=master' alt='Build Status' class='center'/></a>
 
 
 SSPINN is a software package meant to predict the structure of organic molecules based on experimentally obtained spectral data. Based on a user's input data, the SSPINN neural network will generate a connectivity matrix which predicts the bonding behavior between atoms in the user's molecule. This connectivity matrix will then be used to generate a graphical depiction of the predicted molecular structure. 
