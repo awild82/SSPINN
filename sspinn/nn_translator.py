@@ -152,11 +152,11 @@ def _multiprocess_preload_data(nproc=28, data_dir='data/data'):
     p = pool.map(nn_translator, file_list)
     p = np.array(p)
 
-    np.save('data/preprocessed_input.npy',
+    np.save(data_dir + '/preprocessed_input.npy',
             np.array([np.array(i) for i in p[:, 0]]).astype(np.uint8))
     target = np.array([np.array(i) for i in p[:, 1]])
     tshape = target.shape
-    np.save('data/preprocessed_target.npy',
+    np.save(data_dir + '/preprocessed_target.npy',
             target.reshape((tshape[0], tshape[1]*tshape[2])).astype(np.uint8))
 
 

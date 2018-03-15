@@ -1,6 +1,7 @@
 import numpy as np
 
 from sspinn.nn_translator import nn_translator as nnt
+from sspinn.nn_translator import _multiprocess_preload_data as mpd
 
 
 def assert_raises(func, error, *args, **kwargs):
@@ -102,3 +103,13 @@ def test_nn_translator():
             print('i,j: (', i, ',', j, '):', result[1][i][j],
                   expected_conn[i][j])
         assert all(result[1][i] == expected_conn[i])
+
+
+def test_multiprocess_preload_data():
+    """ Tests preloaded data fucntion """
+
+    good_file = '../sspinn/test/data/good_data/'
+
+    t = mpd(nproc=28, data_dir=good_file)
+    assert t.file_list is not None, "Not finding .txt files"
+    assert isinstance(t.p, np.array), "Did not handle data pooling"
